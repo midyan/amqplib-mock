@@ -1,31 +1,40 @@
 {
-  "name": "amqplib-mock",
-  "version": "0.0.4",
-  "description": "Mock library for amqplib with promise and callback api support.",
-  "main": "index.js",
-  "directories": {
-    "lib": "lib"
-  },
-  "scripts": {
-    "test": "mocha test/ --recursive --exit --reporter spec"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/jbactad/amqplib-mock.git"
-  },
-  "keywords": [
-    "mock",
-    "amqplib",
-    "amqp",
-    "test"
-  ],
-  "author": "Jim Geoshua P. Bactad",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/jbactad/amqplib-mock/issues"
-  },
-  "homepage": "https://github.com/jbactad/amqplib-mock#readme",
-  "devDependencies": {
-    "mocha": "^4.1.0"
-  }
+    "name": "amqplib-mock",
+    "version": "0.0.4",
+    "description": "Mock library for amqplib with promise and callback api support.",
+    "main": "index.js",
+    "directories": {
+        "lib": "lib"
+    },
+    "scripts": {
+        "test": "mocha test/ --recursive --exit --reporter spec"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/jbactad/amqplib-mock.git"
+    },
+    "keywords": [
+        "mock",
+        "amqplib",
+        "amqp",
+        "test"
+    ],
+    "author": "Jim Geoshua P. Bactad",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/jbactad/amqplib-mock/issues"
+    },
+    "homepage": "https://github.com/jbactad/amqplib-mock#readme",
+    "devDependencies": {
+        "mocha": "^4.1.0",
+        "prettier": "^1.11.1",
+        "eslint": "^4.19.0",
+        "babel-eslint": "^8.0.2",
+        "prettier-eslint": "^8.8.1",
+        "eslint-plugin-node": "^6.0.0",
+        "eslint-plugin-import": "^2.8.0",
+        "eslint-plugin-promise": "^3.6.0",
+        "eslint-plugin-standard": "^3.0.1",
+        "eslint-config-standard": "^11.0.0-beta.0"
+    }
 }

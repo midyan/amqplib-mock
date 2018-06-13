@@ -1,104 +1,109 @@
-"use strict";
+let queues = {}
+let exchanges = {}
+let channel = {
+    async assertQueue(queue, qOptions) {
+        setIfUndef(queues, queue, {
+            messages: [],
+            subscribers: [],
+            options: qOptions,
+        })
+    },
 
-var exchanges = {};
-var queues = {};
-var channel = {
-  assertQueue: function (queue, qOptions) {
-    return new Promise(function (resolve) {
-      setIfUndef(queues, queue, { messages: [], subscribers: [], options: qOptions });
-      return resolve();
-    });
-  },
+    async sendToQueue() {
+        return {}
+    },
 
-  assertExchange: function (exchange, type, exchOptions) {
-    return new Promise(function (resolve) {
-      exchOptions = exchOptions || {};
-      setIfUndef(exchanges, exchange, { bindings: [], options: exchOptions, type: type });
+    async assertExchange(exchange, type, exchOptions) {
+        exchOptions = exchOptions || {}
+        setIfUndef(exchanges, exchange, {
+            bindings: [],
+            options: exchOptions,
+            type: type,
+        })
+    },
 
-      return resolve();
-    });
-  },
+    async bindQueue(queue, exchange, key) {
+        if (!exchanges[exchange]) throw new Error('Bind to non-existing exchange ' + exchange)
 
-  bindQueue: function (queue, exchange, key, args) {
-    return new Promise(function (resolve, reject) {
-      if (!exchanges[exchange])
-        return reject("Bind to non-existing exchange " + exchange);
+        const re =
+            '^' +
+            key
+                .replace('.', '\\.')
+                .replace('#', '(\\w|\\.)+')
+                .replace('*', '\\w+') +
+            '$'
 
-      var re = "^" + key.replace(".", "\\.").replace("#", "(\\w|\\.)+").replace("*", "\\w+") + "$";
-      exchanges[exchange].bindings.push({ regex: new RegExp(re), queueName: queue });
+        exchanges[exchange].bindings.push({
+            regex: new RegExp(re),
+            queueName: queue,
+        })
+    },
 
-      return resolve();
-    });
-  },
+    async publish(exchange, routingKey, content, props) {
+        if (!exchanges[exchange]) throw new Error('Publish to non-existing exchange ' + exchange)
 
-  publish: function (exchange, routingKey, content, props) {
-    return new Promise(function (resolve, reject) {
-      if (!exchanges[exchange])
-        return reject("Publish to non-existing exchange " + exchange);
+        let bindings = exchanges[exchange].bindings
 
-      var bindings = exchanges[exchange].bindings;
-      var matchingBindings = bindings.filter(function (b) { return b.regex.test(routingKey); });
+        let matchingBindings = bindings.filter(b => b.regex.test(routingKey))
 
-      matchingBindings.forEach(function (binding) {
-        var subscribers = queues[binding.queueName] ? queues[binding.queueName].subscribers : [];
-        subscribers.forEach(function (sub) {
-          var message = { fields: { routingKey: routingKey }, properties: props, content: content };
-          sub(message);
-        });
-      });
+        matchingBindings.forEach(function(binding) {
+            let subscribers = queues[binding.queueName] ? queues[binding.queueName].subscribers : []
+            subscribers.forEach(function(sub) {
+                let message = {
+                    fields: { routingKey: routingKey },
+                    properties: props,
+                    content: content,
+                }
+                sub(message)
+            })
+        })
+    },
 
-      return resolve();
-    })
-  },
+    async consume(queue, handler) {
+        queues[queue].subscribers.push(handler)
+    },
 
-  consume: function (queue, handler) {
-    queues[queue].subscribers.push(handler);
-  },
+    async deleteQueue(queue) {
+        setImmediate(function() {
+            delete queues[queue]
+        })
+    },
 
-  deleteQueue: function (queue) {
-    setImmediate(function () {
-      delete queues[queue];
-    });
-  },
+    async ack() {},
+    async nack() {},
+    async prefetch() {},
+    async on() {},
+    async close() {
+        return {}
+    },
+}
 
-  ack: function () { },
-  nack: function () { },
-  prefetch: function () { },
-  on: function () { },
-  close: function () {
-    return Promise.resolve();
-  }
-};
-function createChannel() {
-  return new Promise(function (resolve) {
-    return resolve(channel);
-  });
-};
-function connect(url, options) {
-  return new Promise(function (resolve) {
+async function createChannel() {
+    return channel
+}
+async function connect() {
+    let connection = {
+        createChannel: createChannel,
+        createConfirmChannel: createChannel,
+        on() {},
+        async close() {},
+    }
 
-    var connection = {
-      createChannel: createChannel,
-      createConfirmChannel: createChannel,
-      on: function () { },
-      close: function () {
-        return Promise.resolve();
-      }
-    };
-
-    return resolve(connection);
-  });
+    return connection
 }
 
 function resetMock() {
-  queues = {};
-  exchanges = {};
+    queues = {}
+    exchanges = {}
 }
 
-module.exports = { connect: connect, resetMock: resetMock };
+module.exports = {
+    connect,
+    resetMock,
+}
 
 function setIfUndef(object, prop, value) {
-  if (!object[prop]) {
-    object[prop] = value;
-  }
+    if (!object[prop]) {
+        object[prop] = value
+    }
 }
