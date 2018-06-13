@@ -7,6 +7,12 @@ let channel = {
             subscribers: [],
             options: qOptions,
         })
+
+        return {
+            queue,
+            messageCount: 0,
+            consumerCount: 0,
+        }
     },
 
     async sendToQueue() {
