@@ -10,13 +10,21 @@ let channel = {
 
         return {
             queue,
-            messageCount: 0,
-            consumerCount: 0,
+            messageCount: queues[queue].messages.length,
+            consumerCount: queues[queue].subscribers.length,
         }
     },
 
-    async sendToQueue() {
-        return {}
+    async sendToQueue(queue, message) {
+        queues[queue].messages.push(message)
+    },
+
+    async checkQueue(queue) {
+        return {
+            queue,
+            messageCount: queues[queue].messages.length,
+            consumerCount: queues[queue].subscribers.length,
+        }
     },
 
     async assertExchange(exchange, type, exchOptions) {
